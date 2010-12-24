@@ -37,6 +37,7 @@ public class GameThread extends Thread {
     mSurfaceHolder = holder;
     mContext = context;
     mHandler = handler;
+    mGameState = STATE_UNKNOWN;
   }
   
   public void setMaxFPS(int fps) {
@@ -67,9 +68,8 @@ public class GameThread extends Thread {
         c = mSurfaceHolder.lockCanvas(null);
         
         synchronized(mSurfaceHolder) {
-          if (mGameState == STATE_RUNNING) {
+          if (mGameState == STATE_RUNNING)
             updateGame();
-          }
             
           doDraw(c);
         }
@@ -117,7 +117,6 @@ public class GameThread extends Thread {
   public void setRunning(boolean running) {
     synchronized (mSurfaceHolder) {
       mRunning = running;
-      //setState(STATE_RUNNING);
     }
   }
   
