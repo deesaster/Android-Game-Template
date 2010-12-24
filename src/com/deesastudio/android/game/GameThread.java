@@ -8,8 +8,11 @@ import android.os.Message;
 import android.view.SurfaceHolder;
 
 public class GameThread extends Thread {
+  public static final int STATE_UNKNOWN = 0;
   public static final int STATE_RUNNING = 1;
   public static final int STATE_PAUSED = 2;
+  public static final int STATE_STOPPED = 4;
+  public static final int STATE_READY = 8;
   
   public static final int MESSAGE_STATE_CHANGED = 1;
   

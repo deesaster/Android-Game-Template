@@ -67,8 +67,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 
   @Override
   public void surfaceCreated(SurfaceHolder holder) {
-    // start the thread here so that we don't busy-wait in run()
-    // waiting for the surface to be created
     mGameThread.setRunning(true);
     mGameThread.start();
   }
