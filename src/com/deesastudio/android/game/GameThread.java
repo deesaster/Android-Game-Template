@@ -4,11 +4,14 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.os.Handler;
+import android.os.Message;
 import android.view.SurfaceHolder;
 
 public class GameThread extends Thread {
   public static final int STATE_RUNNING = 1;
   public static final int STATE_PAUSED = 2;
+  
+  public static final int MESSAGE_STATE_CHANGED = 1;
   
   private SurfaceHolder mSurfaceHolder;
   private Context       mContext;
@@ -97,13 +100,21 @@ public class GameThread extends Thread {
   
   public void setState(int state) {
     synchronized(mSurfaceHolder) {
+      int oldState = mGameState;
       mGameState = state;
+      
+      Message msg = mHandler.obtainMessage();
+      msg.what = MESSAGE_STATE_CHANGED;
+      msg.arg1 = oldState;
+      msg.arg2 = mGameState;
+      mHandler.sendMessage(msg);
     }
   }
   
   public void setRunning(boolean running) {
     synchronized (mSurfaceHolder) {
       mRunning = running;
+      //setState(STATE_RUNNING);
     }
   }
   

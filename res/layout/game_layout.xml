@@ -8,4 +8,24 @@
   	android:id="@+id/gameView"
   	android:layout_width="fill_parent"
   	android:layout_height="fill_parent"/>
+    
+  <LinearLayout
+    android:id="@+id/headerView"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="#99000000">
+    
+    <Button
+      android:id="@+id/pauseGame"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="Pause" />
+      
+    <TextView
+      android:id="@+id/textStatus"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:text="Status" />  
+  </LinearLayout>
 </FrameLayout>
