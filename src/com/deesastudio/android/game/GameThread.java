@@ -1,6 +1,7 @@
 package com.deesastudio.android.game;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.os.Handler;
 import android.view.SurfaceHolder;
@@ -23,6 +24,9 @@ public class GameThread extends Thread {
   private int           mMaxFPS = 40;
   private long          mMaxTick = 1000/40;
   
+  private Bitmap        mBackgroundBitmap;
+  private boolean       mDrawBackground = false;
+  
   public GameThread(SurfaceHolder holder, Context context, Handler handler) {
     mSurfaceHolder = holder;
     mContext = context;
@@ -33,6 +37,18 @@ public class GameThread extends Thread {
     synchronized (mSurfaceHolder) {
       mMaxFPS = fps;
       mMaxTick = 1000/mMaxFPS;
+    }
+  }
+  
+  public void setBackgroundBitmap(Bitmap bg) {
+    synchronized (mSurfaceHolder) {
+      mBackgroundBitmap = bg;
+    }
+  }
+  
+  public void setDrawBackground(boolean drawBackground) {
+    synchronized (mSurfaceHolder) {
+      mDrawBackground = drawBackground;
     }
   }
   
@@ -117,7 +133,8 @@ public class GameThread extends Thread {
   }
   
   protected void doDraw(Canvas c) {
-    
+    if (mDrawBackground && mBackgroundBitmap != null)
+      c.drawBitmap(mBackgroundBitmap, 0, 0, null);
   }
   
   protected int getSurfaceWidth() {

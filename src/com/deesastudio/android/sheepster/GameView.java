@@ -76,6 +76,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
     public SheepsterGameThread(SurfaceHolder holder, Context context, Handler handler) {
       super(holder, context, handler);
       setMaxFPS(25);
+      setBackgroundBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.menu_background));
+      setDrawBackground(true);
       
       tempB = BitmapFactory.decodeResource(context.getResources(), R.drawable.icon);
     }
