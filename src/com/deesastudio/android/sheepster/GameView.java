@@ -1,9 +1,6 @@
 package com.deesastudio.android.sheepster;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
@@ -15,7 +12,7 @@ import com.deesastudio.android.game.listener.OnGameStateChangedListener;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback{
   
-  private SheepsterGameThread         mGameThread;
+  private SheepsterGame               mGame;
   private OnGameStateChangedListener  mGameStateListener;
   private Handler                     mHandler;
   private int                         mGameState;
@@ -31,7 +28,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
   }
   
   private void initGameThread() {
-    mGameThread = new SheepsterGameThread(getHolder(), getContext(),  mHandler);
+    mGame = new SheepsterGame(getHolder(), getContext(),  mHandler);
   }
   
   private void initHandler() {
@@ -55,12 +52,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
   }
   
   public void pause() {
-    mGameThread.pause();
+    mGame.pause();
   }
   
   
   public void start() {
-    mGameThread.doStart();
+    mGame.doStart();
   }
   
   @Override
@@ -72,62 +69,36 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
   @Override
   public void surfaceChanged(SurfaceHolder holder, int format, int width,
       int height) {
-    mGameThread.setSurfaceSize(width, height);
+    mGame.setSurfaceSize(width, height);
   }
 
   @Override
   public void surfaceCreated(SurfaceHolder holder) {
-    if (mGameThread == null)
+    if (mGame == null)
       initGameThread();
     
-    mGameThread.setRunning(true);
+    mGame.setRunning(true);
     
     if(mGameState == GameThread.STATE_PAUSED)
-      mGameThread.setState(GameThread.STATE_PAUSED);
+      mGame.setState(GameThread.STATE_PAUSED);
     else
-      mGameThread.setState(GameThread.STATE_READY);
+      mGame.setState(GameThread.STATE_READY);
     
-    mGameThread.start();
+    mGame.start();
   }
 
   @Override
   public void surfaceDestroyed(SurfaceHolder holder) {
     
     boolean retry = true;
-    mGameThread.setRunning(false);
+    mGame.setRunning(false);
     while (retry) {
       try {
-        mGameThread.join();
+        mGame.join();
           retry = false;
       } catch (InterruptedException e) {
       }
     }
-    mGameThread = null;
-  }
-  
-  class SheepsterGameThread extends GameThread {
-
-    private Bitmap tempB;
-    
-    public SheepsterGameThread(SurfaceHolder holder, Context context, Handler handler) {
-      super(holder, context, handler);
-      setMaxFPS(25);
-      setBackgroundBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.menu_background));
-      setDrawBackground(true);
-      
-      tempB = BitmapFactory.decodeResource(context.getResources(), R.drawable.icon);
-    }
-    
-    @Override
-    protected void doDraw(Canvas c) {
-      super.doDraw(c);
-      
-      c.drawBitmap(tempB, 0, 0, null);
-    }
-    
-    @Override
-    protected void doUpdate(double interpolator) {
-      super.doUpdate(interpolator);
-    }
+    mGame = null;
   }
 }
