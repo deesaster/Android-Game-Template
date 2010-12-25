@@ -17,6 +17,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
   
   private SheepsterGameThread         mGameThread;
   private OnGameStateChangedListener  mGameStateListener;
+  private Handler                     mHandler;
+  private int                         mGameState;
   
   public GameView(Context context, AttributeSet attrs) {
     super(context, attrs);
@@ -24,17 +26,28 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
     SurfaceHolder holder = getHolder();
     holder.addCallback(this);
     
-    mGameThread = new SheepsterGameThread(holder, getContext(), new Handler() {
+    initHandler();
+    initGameThread();
+  }
+  
+  private void initGameThread() {
+    mGameThread = new SheepsterGameThread(getHolder(), getContext(),  mHandler);
+  }
+  
+  private void initHandler() {
+    mHandler = new Handler() {
       @Override
       public void handleMessage(Message m) {
         switch(m.what) {
         case GameThread.MESSAGE_STATE_CHANGED:
+          mGameState = m.arg2;
+          
           if (mGameStateListener != null)
             mGameStateListener.onGameStateChanged(m.arg1, m.arg2);
           break;
         }
       }
-    });
+    };
   }
   
   public void setOnGameStateChangedListener(OnGameStateChangedListener listener) {
@@ -49,14 +62,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
   public void start() {
     mGameThread.doStart();
   }
-  /**
-   * Standard window-focus override. Notice focus lost so we can pause on
-   * focus lost. e.g. user switches to take a call.
-   */
+  
   @Override
   public void onWindowFocusChanged(boolean hasWindowFocus) {
-      if (!hasWindowFocus)
-        pause();
+    if (!hasWindowFocus)
+      pause();
   }
   
   @Override
@@ -67,15 +77,22 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 
   @Override
   public void surfaceCreated(SurfaceHolder holder) {
+    if (mGameThread == null)
+      initGameThread();
+    
     mGameThread.setRunning(true);
+    
+    if(mGameState == GameThread.STATE_PAUSED)
+      mGameThread.setState(GameThread.STATE_PAUSED);
+    else
+      mGameThread.setState(GameThread.STATE_READY);
+    
     mGameThread.start();
-    mGameThread.setState(GameThread.STATE_READY);
   }
 
   @Override
   public void surfaceDestroyed(SurfaceHolder holder) {
-    // we have to tell thread to shut down & wait for it to finish, or else
-    // it might touch the Surface after we return and explode
+    
     boolean retry = true;
     mGameThread.setRunning(false);
     while (retry) {
@@ -85,6 +102,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
       } catch (InterruptedException e) {
       }
     }
+    mGameThread = null;
   }
   
   class SheepsterGameThread extends GameThread {

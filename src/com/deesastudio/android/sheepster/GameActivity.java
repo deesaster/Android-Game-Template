@@ -2,6 +2,7 @@ package com.deesastudio.android.sheepster;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Window;
 import android.widget.TextView;
 
@@ -25,18 +26,19 @@ public class GameActivity extends Activity {
     mGameView = (GameView)findViewById(R.id.gameView);
     
     initGameStateListener();
+    mGameView.setOnGameStateChangedListener(mGameStateListener);
   }
   
   @Override
   protected void onResume() {
     super.onResume();
     
-    mGameView.setOnGameStateChangedListener(mGameStateListener);
+    //mGameView.setOnGameStateChangedListener(mGameStateListener);
   }
   
   @Override 
   protected void onPause() {
-    mGameView.setOnGameStateChangedListener(null);
+    //mGameView.setOnGameStateChangedListener(null);
     
     super.onPause();
   }
@@ -57,6 +59,7 @@ public class GameActivity extends Activity {
       @Override
       public void onGameStateChanged(int oldState, int newState) {
         mStatusTextView.setText("state=" + newState);
+        Log.d("test", "state=" + newState);
         
         switch(newState) {
         case GameThread.STATE_RUNNING:
